@@ -42,9 +42,20 @@ class FwdKin:
 
         L_1 = 0.13
         L_2 = 0.124
+        L_3 = 0.126
 
-        r = L_1 * math.cos(theta_1) + L_2 * math.cos(theta_1 + theta_2)
-        z = L_1 * math.sin(theta_1) + L_2 * math.sin(theta_1 + theta_2)
+        # This does not do camera position, but EE position!!
+
+        r = (
+            L_1 * math.cos(theta_1)
+            + L_2 * math.cos(theta_1 + theta_2)
+            + L_3 * math.cos(theta_1 + theta_2 + theta_3)
+        )
+        z = (
+            L_1 * math.sin(theta_1)
+            + L_2 * math.sin(theta_1 + theta_2)
+            + L_3 * math.sin(theta_1 + theta_2 + theta_3)
+        )
 
         y = math.sin(alpha) * r
         x = math.sqrt(r**2 - y**2)

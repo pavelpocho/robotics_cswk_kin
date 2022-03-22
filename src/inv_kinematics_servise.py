@@ -26,7 +26,11 @@ class InvKin:
         # Use L_3 to compensate for this in the preliminary target position
         # to keep the calculations the same
 
-        ### DO NOT RUN THIS ON THE ROBOT!!!!! TEST IT FIRST TO HAVE CORRECT ANGLE OFFSETS
+        ### DO NOT RUN THIS ON THE ROBOT!!!!!
+        # TEST IT FIRST TO HAVE CORRECT ANGLE OFFSETS (AKA ORIENTATIONS)
+
+        # 1. Find joint limits and their respective positions
+        # 2. Look at how that impacts the logic
 
         rsp = IKinMsgResponse()
         rsp.joint_positions = []
@@ -40,16 +44,30 @@ class InvKin:
 
         # is this correct? we want it to point down..
         # what if we want to approach it from the side?
-        TARGET_ANGLE = math.pi
+        TARGET_ANGLE = -math.pi / 2
 
         r = max(0.0001, math.sqrt(x**2 + y**2))
         alpha = math.asin(y / r)
 
+        # the target coordinates (r, z) need to be offset by the distance of the third
+        # arm (length of end-effector) and the angle at which it is
+        # this is calculated from TARGET_ANGLE
+
+        # note that this is likely configured for the wrong orientations
+        ee_dist_z = L_3 * math.sin(TARGET_ANGLE)
+        ee_dist_r = L_3 * math.cos(TARGET_ANGLE)
+        # ee_dist_r = 0
+        # ee_dist_z = 0
+
+        # again, the signs might be wrong here
+        r -= ee_dist_r
+        z -= ee_dist_z
+
         c_2 = (r**2 + z**2 - L_1**2 - L_2**2) / (2 * L_1 * L_2)
         # this is just to make sure it will always fail until we figure out what
         # offsets it needs to have
-        # if c_2 < -1 or c_2 > 1:
-        if True:
+        if c_2 < -1 or c_2 > 1:
+            # if True:
             rsp.success.data = False
             return rsp
 
