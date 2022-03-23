@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 import rospy
 import math
@@ -6,7 +6,7 @@ import math
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Point
 
-from cswk_kin.srv import FKinMsg, FKinMsgResponse
+from robotics_cswk_kin.srv import FKinMsg, FKinMsgResponse
 
 
 class FwdKin:
@@ -21,10 +21,10 @@ class FwdKin:
         self._as = rospy.Service("/fwd_kin", FKinMsg, self.calculateCameraPosition)
         rospy.spin()
 
-    def saveJoints(self, jointState: JointState):
+    def saveJoints(self, jointState):
         self._joints = jointState.position
 
-    def calculateCameraPosition(self, _) -> FKinMsgResponse:
+    def calculateCameraPosition(self, _):
         wait_for_joints = rospy.Rate(2)
         if len(self._joints) < 4:
             wait_for_joints.sleep()
@@ -35,9 +35,14 @@ class FwdKin:
         # Use theta_3 for that along with information about
         # where the camera is in relation to the last joint
 
+        # Changes made compared to original calculation:
+        # Subtracted 1.29 from joint 2
+        # Added 1.29 to joint 3
+        # Set z as negative
+
         alpha = self._joints[0]
-        theta_1 = self._joints[1]
-        theta_2 = self._joints[2]
+        theta_1 = self._joints[1] - 1.29
+        theta_2 = self._joints[2] + 1.29
         theta_3 = self._joints[3]
 
         L_1 = 0.13
@@ -46,12 +51,19 @@ class FwdKin:
 
         # This does not do camera position, but EE position!!
 
+        # The actual formula here is
+        # r = L_1 * math.cos((joint_1 - 73.96)) + L_2 * math.cos((joint_1 - 73.96) + (joint_2 + 73.96))
+        # z = L_1 * math.sin((joint_1 - 73.96)) + L_2 * math.sin((joint_1 - 73.96) + (joint_2 + 73.96))
+        # This is exactly what I did when setting theta_1 and theta_2 and is correct
+
+        print(theta_1 + theta_2 + theta_3)
+
         r = (
             L_1 * math.cos(theta_1)
             + L_2 * math.cos(theta_1 + theta_2)
             + L_3 * math.cos(theta_1 + theta_2 + theta_3)
         )
-        z = (
+        z = -(
             L_1 * math.sin(theta_1)
             + L_2 * math.sin(theta_1 + theta_2)
             + L_3 * math.sin(theta_1 + theta_2 + theta_3)
@@ -59,6 +71,8 @@ class FwdKin:
 
         y = math.sin(alpha) * r
         x = math.sqrt(r**2 - y**2)
+
+        # WITHOUT JOINT 4, THIS IS CORRECT
 
         rsp = FKinMsgResponse()
         rsp.position = Point()
