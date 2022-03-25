@@ -47,9 +47,8 @@ class FwdKin:
 
         L_1 = 0.13
         L_2 = 0.124
-        L_3 = 0.126
-
-        # This does not do camera position, but EE position!!
+        L_3 = 0.070 # This is for the camera, but there is also a shift in z
+        L_3Z = 0.052 # This is the z shift of the camera
 
         # The actual formula here is
         # r = L_1 * math.cos((joint_1 - 73.96)) + L_2 * math.cos((joint_1 - 73.96) + (joint_2 + 73.96))
@@ -62,11 +61,13 @@ class FwdKin:
             L_1 * math.cos(theta_1)
             + L_2 * math.cos(theta_1 + theta_2)
             + L_3 * math.cos(theta_1 + theta_2 + theta_3)
+            + L_3Z * math.cos(theta_1 + theta_2 + theta_3 - math.pi/2)
         )
         z = -(
             L_1 * math.sin(theta_1)
             + L_2 * math.sin(theta_1 + theta_2)
             + L_3 * math.sin(theta_1 + theta_2 + theta_3)
+            + L_3Z * math.sin(theta_1 + theta_2 + theta_3 - math.pi/2)
         )
 
         y = math.sin(alpha) * r
@@ -79,6 +80,7 @@ class FwdKin:
         rsp.position.x = x
         rsp.position.y = y
         rsp.position.z = z
+        rsp.angle.data = theta_1 + theta_2 + theta_3
         return rsp
 
 
