@@ -1,0 +1,8 @@
+<launch>
+    <node
+        pkg="robotics_cswk_kin"
+        type="fwd_kinematics_service.py"
+        name="fwd_kin_service"
+        output="screen"
+    />
+</launch>

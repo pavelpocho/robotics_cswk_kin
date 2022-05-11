@@ -119,6 +119,10 @@ class InvKin:
         rsp.joint_positions[2].data = - theta_2 - 1.29 # This is absolutely correct
         rsp.joint_positions[3].data = theta_3
 
+        # Joint 2 ([1]) can go down to -1.5 rad and up to 1.5 rad
+        # Joint 3 ([2]) can go down to -1.5 rad and up to 1.5 rad 
+        # Joint 4 ([3]) can go down to -1.8 rad and up to 2 rad
+
         # for r in rsp.joint_positions:
         #     if r.data > math.pi / 2 or r.data < math.pi / 2:
         #         rsp.success.data = False
