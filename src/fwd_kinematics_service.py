@@ -55,8 +55,6 @@ class FwdKin:
         # z = L_1 * math.sin((joint_1 - 73.96)) + L_2 * math.sin((joint_1 - 73.96) + (joint_2 + 73.96))
         # This is exactly what I did when setting theta_1 and theta_2 and is correct
 
-        print(theta_1 + theta_2 + theta_3)
-
         r = (
             L_1 * math.cos(theta_1)
             + L_2 * math.cos(theta_1 + theta_2)

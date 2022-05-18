@@ -71,22 +71,13 @@ class InvKin:
         # ee_dist_r = 0
         # ee_dist_z = 0
 
-        print('EE dists would be ')
-        print(ee_dist_r)
-        print(ee_dist_z)
-
         # again, the signs might be wrong here
         r -= ee_dist_r
         z -= ee_dist_z
 
-        print('Corrected coords for EE')
-        print('R:', r)
-        print('Z:', z)
-
         # This c_2 is of an angle that has some other angle in it, which is the default offset
         # So c_2 is cosine of second angle (theta_2), which is joint angle 2 + 73.96deg (1.29rad) (from fwd kin)
         c_2 = (r**2 + z**2 - L_1**2 - L_2**2) / (2 * L_1 * L_2)
-        print('C2:', c_2)
         # this is just to make sure it will always fail until we figure out what
         # offsets it needs to have
         if c_2 < -1 or c_2 > 1:
